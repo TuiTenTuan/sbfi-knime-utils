@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sbfi-knime-ultils"
+version = "1.0.0"
+authors = [
+  { name = "SBFI CoE Team", email = "sbfap_autobot@suntory.com" },
+]
+description = "A lightweight logging utility with folder clearing, browser download support, and pandas DataFrame output."
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+  "pandas>=1.5.0",
+  "selenium>=4.0.0",
+  "webdriver_manager>=4.0.0",
+]
+keywords = ["logging", "folder", "browser", "pandas", "selenium"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+]
+
+[project.urls]
+Homepage = "https://github.com/TuiTenTuan/sbfi-knime-utils"
+Repository = "https://github.com/TuiTenTuan/sbfi-knime-utils"
