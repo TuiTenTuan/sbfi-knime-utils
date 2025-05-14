@@ -4,7 +4,7 @@ sbfi-knime-utils: A utility package for KNIME workflows SBFI.
 This package provides helper functions and utilities to streamline KNIME integration.
 """
 
-__version__ = "1.1.0"
+__version__ = "1.1.1"
 __author__ = "SBFI CoE Team"
 __email__ = "sbfap_autobot@suntory.com"
 
