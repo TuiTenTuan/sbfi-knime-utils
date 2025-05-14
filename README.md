@@ -22,7 +22,7 @@ pip install sbfi-knime-utils
 ### Basic Logging
 Create a logger, log messages, and export logs to a pandas DataFrame:
 ```python
-from folder_logger import Logger
+from sbfi_knime_ultils.logger import Logger
 
 # Initialize logger
 logger = Logger()
@@ -40,7 +40,7 @@ knio.output_tables[2] = knio.Table.from_pandas(df)
 ### Folder Management
 Clear or create a folder:
 ```python
-from folder_logger import clear_folder
+from sbfi_knime_ultils.file_utils import clear_folder
 
 # Clear all files in a folder
 clear_folder("logs")
@@ -52,7 +52,8 @@ clear_folder("logs", clear_files=False)
 ### Browser Automation
 Set up a Chrome WebDriver for downloading files and monitor the download directory:
 ```python
-from folder_logger import Logger, create_chrome_driver, wait_download_file
+from sbfi_knime_ultils.logger import Logger
+from sbfi_knime_ultils.chrome_utils import create_chrome_driver, wait_download_file
 
 # Initialize logger
 logger = Logger()
@@ -81,7 +82,7 @@ browser.quit()
 ### Advanced Example
 Combine logging, folder management, and browser automation:
 ```python
-from folder_logger import Logger, clear_folder, create_chrome_driver, wait_download_file
+from sbfi_knime_ultils.chrome_utils import create_chrome_driver, wait_download_file
 
 # Initialize logger
 logger = Logger()
@@ -111,6 +112,39 @@ logger.log("main", f"Processed files: {output_files}")
 
 # Export logs
 print(logger.get_log_dataframe())
+
+# Clean up
+browser.quit()
+```
+
+### Enable download when run in headless mode
+Set up a Chrome WebDriver for downloading files and monitor the download directory:
+```python
+from sbfi_knime_ultils.logger import Logger
+from sbfi_knime_ultils.chrome_utils import create_chrome_driver, wait_download_file, enable_download_headless
+
+# Initialize logger
+logger = Logger()
+
+# Create Chrome WebDriver with default download directory
+browser = create_chrome_driver(logger=logger)  # Uses <cwd>/data/download
+
+# enable download before start download
+enable_download_headless(browser)
+
+# Navigate to a download URL (example)
+browser.get("https://example.com/sample.pdf")
+
+# Wait for and process downloaded files
+output_files = wait_download_file(
+    folder_to_check="data/download",
+    extension="pdf",
+    folder_storage="storage",
+    max_waiting_download=30,
+    replace_filename="report",
+    logger=logger
+)
+print(output_files)
 
 # Clean up
 browser.quit()
