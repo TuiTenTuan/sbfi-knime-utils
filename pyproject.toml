@@ -1,10 +1,13 @@
 [build-system]
-requires = ["setuptools>=61.0", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling >= 1.26"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["sbfi_knime_utils"]
 
 [project]
-name = "sbfi-knime-ultils"
-version = "1.1.1"
+name = "sbfi_knime_utils"
+version = "1.2.0"
 authors = [
   { name = "SBFI CoE Team", email = "sbfap_autobot@suntory.com" },
 ]
@@ -16,7 +19,7 @@ dependencies = [
   "selenium>=4.0.0",
   "webdriver_manager>=4.0.0",
 ]
-keywords = ["logging", "folder", "browser", "pandas", "selenium"]
+keywords = ["logging", "folder", "browser", "selenium"]
 classifiers = [
   "Programming Language :: Python :: 3",
   "License :: OSI Approved :: MIT License",

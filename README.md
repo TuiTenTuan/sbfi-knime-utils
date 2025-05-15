@@ -22,7 +22,7 @@ pip install sbfi-knime-utils
 ### Basic Logging
 Create a logger, log messages, and export logs to a pandas DataFrame:
 ```python
-from sbfi_knime_ultils.logger import Logger
+from sbfi_knime_utils.logger import Logger
 
 # Initialize logger
 logger = Logger()
@@ -40,7 +40,7 @@ knio.output_tables[2] = knio.Table.from_pandas(df)
 ### Folder Management
 Clear or create a folder:
 ```python
-from sbfi_knime_ultils.file_utils import clear_folder
+from sbfi_knime_utils.file_utils import clear_folder
 
 # Clear all files in a folder
 clear_folder("logs")
@@ -52,8 +52,8 @@ clear_folder("logs", clear_files=False)
 ### Browser Automation
 Set up a Chrome WebDriver for downloading files and monitor the download directory:
 ```python
-from sbfi_knime_ultils.logger import Logger
-from sbfi_knime_ultils.chrome_utils import create_chrome_driver, wait_download_file
+from sbfi_knime_utils.logger import Logger
+from sbfi_knime_utils.chrome_utils import create_chrome_driver, wait_download_file
 
 # Initialize logger
 logger = Logger()
@@ -82,7 +82,7 @@ browser.quit()
 ### Advanced Example
 Combine logging, folder management, and browser automation:
 ```python
-from sbfi_knime_ultils.chrome_utils import create_chrome_driver, wait_download_file
+from sbfi_knime_utils.chrome_utils import create_chrome_driver, wait_download_file
 
 # Initialize logger
 logger = Logger()
@@ -120,8 +120,8 @@ browser.quit()
 ### Enable download when run in headless mode
 Set up a Chrome WebDriver for downloading files and monitor the download directory:
 ```python
-from sbfi_knime_ultils.logger import Logger
-from sbfi_knime_ultils.chrome_utils import create_chrome_driver, wait_download_file, enable_download_headless
+from sbfi_knime_utils.logger import Logger
+from sbfi_knime_utils.chrome_utils import create_chrome_driver, wait_download_file, enable_download_headless
 
 # Initialize logger
 logger = Logger()
