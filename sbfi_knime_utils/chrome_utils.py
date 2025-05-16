@@ -181,6 +181,7 @@ def create_chrome_driver(
     headless: bool = True,
     clear_download_dir: bool = True,
     disable_web_security: bool = False,
+    domain_skip_security: Optional[List[str]] = None,
     logger: Optional[Logger] = None
 ) -> WebDriver:
     """
@@ -219,17 +220,26 @@ def create_chrome_driver(
     chrome_options.add_argument("--kiosk-printing") 
     chrome_options.add_argument("--window-size=1920x1080")
     chrome_options.add_experimental_option("excludeSwitches", ["enable-logging"])
+    chrome_options.add_argument("--disable-blink-features=AutomationControlled")
     
     if headless:
-        chrome_options.add_argument("--headless")
+        chrome_options.add_argument("--headless=new")
 
     if disable_web_security:
         chrome_options.add_argument("--disable-web-security")
         chrome_options.add_argument("--allow-running-insecure-content")
-        chrome_options.add_argument("--allow-insecure-localhost")
-        chrome_options.add_argument("--allow-insecure-website")
         chrome_options.add_argument("--ignore-certificate-errors")
-        chrome_options.add_argument("--disable-web-security")
+        chrome_options.add_argument("--allow-insecure-localhost")
+        chrome_options.add_argument("--disable-client-side-phishing-detection")
+        chrome_options.add_argument("--disable-features=BlockInsecurePrivateNetworkRequests")
+
+        if domain_skip_security:
+            for domain in domain_skip_security:
+                if domain.startswith("http://") or domain.startswith("https://"):
+                    origin = domain
+                else:
+                    origin = "http://" + domain
+                chrome_options.add_argument(f"--unsafely-treat-insecure-origin-as-secure={origin}")
     
     prefs = {
         "download.default_directory": os.path.abspath(download_dir),

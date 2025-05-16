@@ -204,6 +204,7 @@ Create a Selenium Chrome WebDriver configured for file downloads.
   - `headless` (bool, optional): Run in headless mode if `True`. Defaults to `True`.
   - `clear_download_dir` (bool, optional): Clear download folder if `True`. Defaults to `True`.
   - `disable_web_security` (bool, optional): Disable web security if `True`. Allow access to the web run with `HTTP` or unsecure. `**BE CAREFULL!!**`. Defaults to `False`.
+  - `domain_skip_security` (List[str], optional): List of domains to treat as secure (bypass insecure warnings). Defaults to `None`.
   - `logger` (Logger, optional): Logger instance for logging actions. Defaults to `None`.
 - **Returns**: `WebDriver` - Configured Chrome WebDriver instance.
 - **Raises**:
