@@ -215,6 +215,9 @@ Create a Selenium Chrome WebDriver configured for file downloads.
   ```python
   browser = create_chrome_driver(download_dir="downloads", logger=logger)
   ```
+  ```python
+  browser = create_chrome_driver(download_dir="downloads", disable_web_security=True, domain_skip_security=["http://localhost.com"] logger=logger)
+  ```
 
 ### `enable_download_headless(browser: WebDriver, download_dir: str, logger: Optional[Logger] = None) -> None`
 Configure a headless Chrome WebDriver to allow file downloads.
