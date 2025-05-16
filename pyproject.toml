@@ -13,7 +13,7 @@ authors = [
 ]
 description = "A lightweight logging utility with folder clearing, browser download support, and pandas DataFrame output."
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.11"
 dependencies = [
   "pandas>=1.5.0",
   "selenium>=4.0.0",
