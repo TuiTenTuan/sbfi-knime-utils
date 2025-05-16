@@ -3,11 +3,13 @@ import time
 import shutil
 from typing import List
 from typing import Optional
+from selenium import webdriver
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 from .logger import Logger
+from .file_utils import clear_folder
 
 def enable_download_headless(
     browser: WebDriver,
@@ -177,6 +179,7 @@ def wait_download_file(
 def create_chrome_driver(
     download_dir: Optional[str] = None,
     headless: bool = True,
+    clear_download_dir: bool = True,
     logger: Optional[Logger] = None
 ) -> WebDriver:
     """
@@ -198,13 +201,10 @@ def create_chrome_driver(
     if download_dir is None:
         download_dir = os.path.join(os.getcwd(), "data", "download")
     
-    try:
-        os.makedirs(download_dir, exist_ok=True)
-    except OSError as e:
-        raise OSError(f"Failed to create download directory '{download_dir}': {e}")
-    
-    if not os.path.isdir(download_dir):
-        raise ValueError(f"'{download_dir}' is not a directory")
+    clear_folder(download_dir, clear_download_dir)
+
+    if not os.access(download_dir, os.W_OK):
+        raise OSError(f"Download directory '{download_dir}' is not writable")
     
     chrome_options = Options()
     chrome_options.add_argument("--start-maximized")
@@ -231,10 +231,9 @@ def create_chrome_driver(
     chrome_options.add_experimental_option("prefs", prefs)
     
     try:
-        driver = WebDriver(
-            service=Service(ChromeDriverManager().install()),
-            options=chrome_options
-        )
+        service = Service(ChromeDriverManager().install())
+        driver = webdriver.Chrome(service=service, options=chrome_options)
+
         if logger:
             logger.log(
                 "create_chrome_driver",
@@ -243,12 +242,12 @@ def create_chrome_driver(
             )
 
         return driver
-    except Exception as e:
+    except Exception as ex:
         if logger:
             logger.log(
                 "create_chrome_driver",
-                f"Failed to create Chrome WebDriver: {e}",
+                f"Failed to create Chrome WebDriver: {ex}",
                 is_error=True
             )
-        raise Exception(f"Failed to create Chrome WebDriver: {e}")
+        raise Exception(f"Failed to create Chrome WebDriver: {ex}")
     
