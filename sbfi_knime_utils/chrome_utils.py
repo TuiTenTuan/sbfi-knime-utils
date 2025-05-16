@@ -211,19 +211,35 @@ def create_chrome_driver(
         raise OSError(f"Download directory '{download_dir}' is not writable")
     
     chrome_options = Options()
-    chrome_options.add_argument("--start-maximized")
-    chrome_options.add_argument("--disable-extensions")
-    chrome_options.add_argument("--incognito")
-    chrome_options.add_argument("--disable-gpu")
-    chrome_options.add_argument("--no-sandbox")
-    chrome_options.add_argument("--disable-dev-shm-usage")
-    chrome_options.add_argument("--kiosk-printing") 
-    chrome_options.add_argument("--window-size=1920x1080")
-    chrome_options.add_experimental_option("excludeSwitches", ["enable-logging"])
+    # Display and startup
+    chrome_options.add_argument("--start-maximized")             # Start maximized (ignored in headless)
+    chrome_options.add_argument("--window-size=1920x1080")       # Ensure fixed resolution for consistency
+    chrome_options.add_argument("--kiosk-printing")              # Silent printing (if printing is needed)
+
+    # Performance and stability
+    chrome_options.add_argument("--no-sandbox")                  # Needed in many headless environments
+    chrome_options.add_argument("--disable-dev-shm-usage")       # Avoid shared memory issues in containers
+    chrome_options.add_argument("--disable-gpu")                 # Disable GPU (required for headless on some systems)
+    chrome_options.add_argument("--disable-software-rasterizer") # Disable software rendering fallback
+
+    # Privacy and security
+    chrome_options.add_argument("--incognito")                   # Run in incognito mode
+    chrome_options.add_argument("--disable-extensions")          # Disable extensions
+    chrome_options.add_argument("--disable-popup-blocking")      # Allow popups (prevent block issues)
+    chrome_options.add_argument("--no-default-browser-check")    # Disable default browser checks
+    chrome_options.add_argument("--no-first-run")                # Skip first run dialogs
+    chrome_options.add_argument("--disable-notifications")       # Disable site notifications
+    chrome_options.add_argument("--disable-default-apps")        # Disable Chrome default apps
+    chrome_options.add_argument("--disable-background-networking") # Prevent background connections
+    chrome_options.add_argument("--disable-sync")                # Disable Chrome sync
+    chrome_options.add_argument("--disable-translate")           # Disable translate prompt
+
+    # Anti-detection
     chrome_options.add_argument("--disable-blink-features=AutomationControlled")
+    chrome_options.add_experimental_option("excludeSwitches", ["enable-logging"])
     
     if headless:
-        chrome_options.add_argument("--headless=new")
+        chrome_options.add_argument("--headless")
 
     if disable_web_security:
         chrome_options.add_argument("--disable-web-security")
