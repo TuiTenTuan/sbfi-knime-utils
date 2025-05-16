@@ -180,6 +180,7 @@ def create_chrome_driver(
     download_dir: Optional[str] = None,
     headless: bool = True,
     clear_download_dir: bool = True,
+    disable_web_security: bool = False,
     logger: Optional[Logger] = None
 ) -> WebDriver:
     """
@@ -188,6 +189,8 @@ def create_chrome_driver(
     Args:
         download_dir (str, optional): Directory for downloaded files.
         headless (bool): Run Chrome in headless mode if True. Defaults to True.
+        clear_download_dir (bool): Clear the download directory if True. Defaults to True.
+        disable_web_security (bool): Disable web security if True. Defaults to False.
         logger (Logger, optional): Logger instance for logging actions.
     
     Returns:
@@ -219,6 +222,14 @@ def create_chrome_driver(
     
     if headless:
         chrome_options.add_argument("--headless")
+
+    if disable_web_security:
+        chrome_options.add_argument("--disable-web-security")
+        chrome_options.add_argument("--allow-running-insecure-content")
+        chrome_options.add_argument("--allow-insecure-localhost")
+        chrome_options.add_argument("--allow-insecure-website")
+        chrome_options.add_argument("--ignore-certificate-errors")
+        chrome_options.add_argument("--disable-web-security")
     
     prefs = {
         "download.default_directory": os.path.abspath(download_dir),
