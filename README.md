@@ -205,6 +205,7 @@ Create a Selenium Chrome WebDriver configured for file downloads.
   - `clear_download_dir` (bool, optional): Clear download folder if `True`. Defaults to `True`.
   - `disable_web_security` (bool, optional): Disable web security if `True`. Allow access to the web run with `HTTP` or unsecure. `**BE CAREFULL!!**`. Defaults to `False`.
   - `domain_skip_security` (List[str], optional): List of domains to treat as secure (bypass insecure warnings). Defaults to `None`.
+  - `enable_incognito` (bool, optional): Run in incognito mode if `True`. Defaults to `True`.
   - `logger` (Logger, optional): Logger instance for logging actions. Defaults to `None`.
 - **Returns**: `WebDriver` - Configured Chrome WebDriver instance.
 - **Raises**:
@@ -216,7 +217,7 @@ Create a Selenium Chrome WebDriver configured for file downloads.
   browser = create_chrome_driver(download_dir="downloads", logger=logger)
   ```
   ```python
-  browser = create_chrome_driver(download_dir="downloads", disable_web_security=True, domain_skip_security=["http://localhost.com"] logger=logger)
+  browser = create_chrome_driver(download_dir="downloads", disable_web_security=True, domain_skip_security=["localhost.com"] logger=logger)
   ```
 
 ### `enable_download_headless(browser: WebDriver, download_dir: str, logger: Optional[Logger] = None) -> None`

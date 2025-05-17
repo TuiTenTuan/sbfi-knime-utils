@@ -182,6 +182,7 @@ def create_chrome_driver(
     clear_download_dir: bool = True,
     disable_web_security: bool = False,
     domain_skip_security: Optional[List[str]] = None,
+    enable_incognito: bool = True,
     logger: Optional[Logger] = None
 ) -> WebDriver:
     """
@@ -192,6 +193,8 @@ def create_chrome_driver(
         headless (bool): Run Chrome in headless mode if True. Defaults to True.
         clear_download_dir (bool): Clear the download directory if True. Defaults to True.
         disable_web_security (bool): Disable web security if True. Defaults to False.
+        domain_skip_security (List[str], optional): List of domains to skip web security checks.
+        enable_incognito (bool): Enable incognito mode if True. Defaults to True.
         logger (Logger, optional): Logger instance for logging actions.
     
     Returns:
@@ -223,7 +226,6 @@ def create_chrome_driver(
     chrome_options.add_argument("--disable-software-rasterizer") # Disable software rendering fallback
 
     # Privacy and security
-    chrome_options.add_argument("--incognito")                   # Run in incognito mode
     chrome_options.add_argument("--disable-extensions")          # Disable extensions
     chrome_options.add_argument("--disable-popup-blocking")      # Allow popups (prevent block issues)
     chrome_options.add_argument("--no-default-browser-check")    # Disable default browser checks
@@ -237,9 +239,12 @@ def create_chrome_driver(
     # Anti-detection
     chrome_options.add_argument("--disable-blink-features=AutomationControlled")
     chrome_options.add_experimental_option("excludeSwitches", ["enable-logging"])
+
+    if enable_incognito:
+        chrome_options.add_argument("--incognito")
     
     if headless:
-        chrome_options.add_argument("--headless")
+        chrome_options.add_argument("--headless=new")
 
     if disable_web_security:
         chrome_options.add_argument("--disable-web-security")
@@ -266,6 +271,7 @@ def create_chrome_driver(
         "pdfjs.disabled": True
     }
     chrome_options.add_experimental_option("prefs", prefs)
+    chrome_options.add_experimental_option('useAutomationExtension', False)
     
     try:
         service = Service(ChromeDriverManager().install())
