@@ -279,4 +279,4 @@ The test suite covers:
 MIT License. See [LICENSE](LICENSE) for details.
 
 ## Support
-For issues or feature requests, open an issue on the [GitHub repository](https://github.com/TuiTenTuan/sbfi-knime-utils).
+For issues or feature requests, open an issue on the [GitHub repository](https://github.com/TuiTenTuan/sbfi-knime-utils/issues).
