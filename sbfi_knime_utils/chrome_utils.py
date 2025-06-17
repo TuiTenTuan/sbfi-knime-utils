@@ -104,26 +104,91 @@ def wait_download_file(
     
     output_file: List[List[str]] = []
     waiting_time = 0
+    # Define common temporary file extensions to ignore initially
+    temp_extensions = (".crdownload", ".tmp", ".part", "!ut")
     
     while True:
-        path_file_reports = [
-            f for f in os.listdir(folder_to_check)
-            if os.path.isfile(os.path.join(folder_to_check, f)) and f.lower().endswith(f".{extension}")
-        ]
-        
-        if path_file_reports:
+        candidate_filenames = []
+        try:
+            for f_name in os.listdir(folder_to_check):
+                full_path = os.path.join(folder_to_check, f_name)
+                if os.path.isfile(full_path):
+                    # Check if it matches the target extension AND is not a known temporary file
+                    if f_name.lower().endswith(f".{extension}") and \
+                       not any(f_name.lower().endswith(temp_ext) for temp_ext in temp_extensions):
+                        candidate_filenames.append(f_name)
+        except OSError as e:
+            if logger:
+                logger.log("wait_download_file", f"Error listing directory {folder_to_check}: {e}", is_error=True)
+            time.sleep(1) # Wait a bit before retrying
+            waiting_time += 1 # Count this as part of waiting time
+            if waiting_time >= max_waiting_download:
+                if logger:
+                    logger.log(
+                        "wait_download_file",
+                        f"Timeout waiting for download after error listing directory {folder_to_check} for {max_waiting_download} seconds",
+                        is_error=True
+                    )
+                raise TimeoutError(f"Timeout waiting for download after error listing directory {folder_to_check}")
+            continue
+
+        stable_files_to_process_this_iteration = []
+        if candidate_filenames:
+            if logger:
+                logger.log("wait_download_file", f"Found candidate files: {candidate_filenames}", is_error=False)
+
+            for report_filename in candidate_filenames:
+                downloaded_file_path = os.path.join(folder_to_check, report_filename)
+                try:
+                    initial_size = os.path.getsize(downloaded_file_path)
+                    time.sleep(1.0) # Wait for 1 second for file to stabilize
+
+                    if not os.path.exists(downloaded_file_path): # File might have been removed/renamed
+                        if logger:
+                            logger.log("wait_download_file", f"File {downloaded_file_path} disappeared during stability check.", is_error=False)
+                        continue
+                    current_size = os.path.getsize(downloaded_file_path)
+
+                    if current_size > 0 and current_size == initial_size:
+                        stable_files_to_process_this_iteration.append(report_filename)
+                        if logger:
+                            logger.log("wait_download_file", f"File {report_filename} (path: {downloaded_file_path}) is stable. Size: {current_size}", is_error=False)
+                    else:
+                        if logger:
+                            log_msg = f"File {report_filename} (path: {downloaded_file_path}) not stable or empty. " \
+                                      f"Initial size: {initial_size}, current size: {current_size}. Will re-check."
+                            logger.log("wait_download_file", log_msg, is_error=False)
+                except FileNotFoundError:
+                    if logger:
+                        logger.log("wait_download_file", f"File {report_filename} (path: {downloaded_file_path}) not found during stability check.", is_error=False)
+                except OSError as e:
+                    if logger:
+                        logger.log("wait_download_file", f"Error checking stability for {report_filename} (path: {downloaded_file_path}): {e}", is_error=True)
+            
+        if stable_files_to_process_this_iteration:
             if logger:
                 logger.log(
                     "wait_download_file",
-                    f"Found downloaded files: {path_file_reports}",
+                    f"Processing stable files: {stable_files_to_process_this_iteration}",
                     is_error=False
                 )
             
-            for path_file_report in path_file_reports:
+            for path_file_report in stable_files_to_process_this_iteration: # path_file_report is now just the filename
                 downloaded_file_path = os.path.join(folder_to_check, path_file_report)
-                downloaded_file_name, downloaded_file_extension = path_file_report.lower().rsplit(".", 1)
-                
+
+                if not os.path.exists(downloaded_file_path): # Re-check existence before move
+                    if logger:
+                        logger.log("wait_download_file", f"File {downloaded_file_path} disappeared before move. Skipping.", is_error=False)
+                    continue
+
+                filename_base, ext_with_dot = os.path.splitext(path_file_report)
+                downloaded_file_name = filename_base.lower()
+                downloaded_file_extension = ext_with_dot.lstrip('.').lower()
+                                
                 new_file_name = replace_filename if replace_filename else downloaded_file_name
+                if replace_filename: # Ensure replace_filename is just a name, not a path
+                    new_file_name = os.path.basename(new_file_name)
+
                 output_file_path = os.path.join(folder_storage, f"{new_file_name}.{downloaded_file_extension}")
                 
                 try:
@@ -144,32 +209,16 @@ def wait_download_file(
                             is_error=True
                         )
                     raise
-                
-                try:
-                    if os.path.exists(downloaded_file_path):
-                        os.remove(downloaded_file_path)
-                        if logger:
-                            logger.log(
-                                "wait_download_file",
-                                f"Removed file: {downloaded_file_path}",
-                                is_error=False
-                            )
-                except OSError as e:
-                    if logger:
-                        logger.log(
-                            "wait_download_file",
-                            f"Failed to remove file {downloaded_file_path}: {e}",
-                            is_error=True
-                        )
-            
+            # All stable files found in this pass have been processed
             return output_file
         
+        # If no stable files were processed, continue polling
         waiting_time += 0.2
         if waiting_time >= max_waiting_download:
             if logger:
                 logger.log(
                     "wait_download_file",
-                    f"Timeout waiting for download after {max_waiting_download} seconds",
+                    f"Timeout waiting for download after {max_waiting_download} seconds. No stable files found.",
                     is_error=True
                 )
             raise TimeoutError("Timeout waiting for download")
