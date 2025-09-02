@@ -287,7 +287,9 @@ def create_chrome_driver(
 
     # Anti-detection
     chrome_options.add_argument("--disable-blink-features=AutomationControlled")
+    chrome_options.add_argument("--disable-infobars")
     chrome_options.add_experimental_option("excludeSwitches", ["enable-logging"])
+    chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
 
     if enable_incognito:
         chrome_options.add_argument("--incognito")
