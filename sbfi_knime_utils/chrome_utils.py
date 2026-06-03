@@ -263,6 +263,7 @@ def create_chrome_driver(
         raise OSError(f"Download directory '{download_dir}' is not writable")
     
     chrome_options = Options()
+    chrome_options.set_capability("goog:loggingPrefs", {"performance": "ALL"})
     # Display and startup
     chrome_options.add_argument("--start-maximized")             # Start maximized (ignored in headless)
     chrome_options.add_argument("--window-size=1920x1080")       # Ensure fixed resolution for consistency
